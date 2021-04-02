@@ -1,5 +1,3 @@
-{Graph} = require('graph.js');
-
 function addEdges(g){
     g.addEdge('E1','E2',10,10);
     g.addEdge('E2','E3',8.5,8.5);
