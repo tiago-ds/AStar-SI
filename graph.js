@@ -80,7 +80,7 @@ class MinHeap {
         if (this.heap.length > 1) {
             let current = this.heap.length - 1;
 
-            while (current > 1 && this.heap[Math.floor(current/2)].funct > this.heap[current].funct) {
+            while (current > 1 && this.heap[Math.floor(current/2)].weight > this.heap[current].weight) {
                 [this.heap[Math.floor(current/2)], this.heap[current]] = [this.heap[current], this.heap[Math.floor(current/2)]];
                 current = Math.floor(current/2);
             }
@@ -95,7 +95,7 @@ class MinHeap {
             this.heap.splice(this.heap.length - 1);
 
             if (this.heap.length === 3) {
-                if (this.heap[1].funct > this.heap[2].funct) {
+                if (this.heap[1].weight > this.heap[2].weight) {
                     [this.heap[1], this.heap[2]] = [this.heap[2], this.heap[1]];
                 }
                 return smallest;
@@ -107,9 +107,9 @@ class MinHeap {
 
             while (this.heap[leftChildIndex] &&
                     this.heap[rightChildIndex] &&
-                    (this.heap[current].weight > this.heap[leftChildIndex].funct ||
-                        this.heap[current].weight > this.heap[rightChildIndex].funct)) {
-                if (this.heap[leftChildIndex].weight < this.heap[rightChildIndex].funct) {
+                    (this.heap[current].weight > this.heap[leftChildIndex].weight ||
+                        this.heap[current].weight > this.heap[rightChildIndex].weight)) {
+                if (this.heap[leftChildIndex].weight < this.heap[rightChildIndex].weight) {
                     [this.heap[current], this.heap[leftChildIndex]] = [this.heap[leftChildIndex], this.heap[current]];
                     current = leftChildIndex;
                 } else {
@@ -145,7 +145,7 @@ function aStar(g, s, e){
     n.checked = true;
     for(const p of n.nodes){
         // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
-        if(!heap.contains(p.destiny) && g.getVertex(p.destiny).checked!=true){
+        if(/*acho que isso não precisa*/!heap.contains(p.destiny) && g.getVertex(p.destiny).checked!=true){
             // Marca esse como inserido na Heap, e insere
             g.getVertex(p.destiny).checked = true;
             heap.insert(p)
@@ -163,6 +163,12 @@ function aStar(g, s, e){
                 // Marca esse como inserido na Heap, e insere
                 g.getVertex(p.destiny).checked = true;
                 heap.insert(p)
+
+                // Aqui, na hora de inserir p, eu tenho que na verdade inserir um node nesses seguintes valores:
+                // W, que seria o peso pra chegar até ele (o W do pai dele + do pai dele até ele)
+                // X, que seria a distancia real + a distancia direta (nesse caso, weight = direta, realDistance = real)
+                // Fazendo assim, na hora de comparar os pesos da Heap, é pra usar a soma dessas duas ai em cima, ao invés 
+                // de weight.
             }
         }
     }
@@ -176,4 +182,4 @@ for(let x = 1; x <= 14; x++){
 addMetroEdges(metro);
 //metro.printGraph();
 
-aStar(metro, 'E6', 'E13');
+aStar(metro, 'E2', 'E6');
