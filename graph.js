@@ -145,24 +145,25 @@ function aStar(g, s, e){
     n.checked = true;
     for(const p of n.nodes){
         // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
-        if(/*acho que isso não precisa*/!heap.contains(p.destiny) && g.getVertex(p.destiny).checked!=true){
+        if(/*acho que isso não precisa!heap.contains(p.destiny) &&*/ g.getVertex(p.destiny).checked!=true){
             // Marca esse como inserido na Heap, e insere
             g.getVertex(p.destiny).checked = true;
-            heap.insert(p)
+            heap.insert(new Edge(p.destiny, p.weight, p.weight+p.realDistance));
         }
     }
     console.log(heap);
     while(heap.size() >= 1 && heap.heap[1].destiny != e){
         console.log(heap);
         let a = heap.remove();
+        console.log('indo para ' + a.destiny);
         n = g.getVertex(a.destiny);
         n.checked = true;
         for(const p of n.nodes){
             // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
-            if(!heap.contains(p.destiny) && g.getVertex(p.destiny).checked!=true){
+            if(/*!heap.contains(p.destiny) && */g.getVertex(p.destiny).checked!=true){
                 // Marca esse como inserido na Heap, e insere
                 g.getVertex(p.destiny).checked = true;
-                heap.insert(p)
+                heap.insert(new Edge(p.destiny, p.weight+a.weight, p.weight+p.realDistance));
 
                 // Aqui, na hora de inserir p, eu tenho que na verdade inserir um node nesses seguintes valores:
                 // W, que seria o peso pra chegar até ele (o W do pai dele + do pai dele até ele)
@@ -182,4 +183,4 @@ for(let x = 1; x <= 14; x++){
 addMetroEdges(metro);
 //metro.printGraph();
 
-aStar(metro, 'E2', 'E6');
+aStar(metro, 'E6', 'E13');
