@@ -170,6 +170,15 @@ function aStar(g, s, e){
                 // X, que seria a distancia real + a distancia direta (nesse caso, weight = direta, realDistance = real)
                 // Fazendo assim, na hora de comparar os pesos da Heap, é pra usar a soma dessas duas ai em cima, ao invés 
                 // de weight.
+                
+                // Ideia é que essa realDistance seja do node atual pra o Final.
+                // Por isso, preciso salvar as ditâncias diretas pra o final. Como?
+
+                // Posso refazer o grafo pra guardar de todos os nodes pra todos os nodes, mas a distância real eu deixo
+                // undefined pra as estações que não têm caminhos entre si
+
+                // Na verdade, eu vou reescrever o código do grafo pra ter 2 maps: Um com a distância real, e um com a
+                // distância direta.
             }
         }
     }
