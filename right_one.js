@@ -338,7 +338,7 @@ function aStar(g, s, e){
                 // Nesse novo NODE eu vou colocar a distância direta desse P pra o FIM, E
                 // O valor salvo em atual, mais a distância de atual pra o que eu tô vendo agora
                 //console.log(`De ${atual.destiny} pra ${p.destiny}: ${g.getRealDistance(atual.destiny, p.destiny)}`);
-                heap.insert(new Node(p.destiny, g.getDirectDistance(p.destiny,e), g.getRealDistance(atual.destiny,p.destiny) + atual.h));
+                heap.insert(new Node(p.destiny, g.getDirectDistance(p.destiny,e), g.getRealDistance(atual.destiny,p.destiny) + atual.g));
                 
                 // Tem algo errado com a função heurística. Quando eu saio de E7 eu vou pra E4. Tudo certo.
                 // Mas aí, E3 fica com o valor maior que E13, o que não era pra acontecer
@@ -357,7 +357,7 @@ for(let x = 1; x <= 14; x++){
 addMetroEdges(metro);
 addDirectEdges(metro);
 
-//aStar(metro, 'E12', 'E6');
-aStar(metro, 'E6', 'E13');
+aStar(metro, 'E12', 'E6');
+//aStar(metro, 'E6', 'E13');
 
 //metro.printGraph();
