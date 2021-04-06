@@ -1,8 +1,13 @@
 // Objeto a ser guardado na Heap
 class Node{
     constructor(destiny, h, g){
+        //String do destino
         this.destiny = destiny;
+        
+        //Distância direta
         this.h = h;
+
+        //Distância real
         this.g = g;
     }
 
@@ -185,16 +190,16 @@ function addMetroEdges(g){
     g.addRealEdge('E2','E10',3.5);
     g.addRealEdge('E3','E4',6.3);
     g.addRealEdge('E3','E9',9.4);
-    g.addRealEdge('E3','E13',12.1);
-    g.addRealEdge('E4','E5',12);
-    g.addRealEdge('E4','E8',12.4);
-    g.addRealEdge('E4','E13',10.6);
+    g.addRealEdge('E3','E13',18.7);
+    g.addRealEdge('E4','E5',13);
+    g.addRealEdge('E4','E8',15.3);
+    g.addRealEdge('E4','E13',12.8);
     g.addRealEdge('E5', 'E6',3);
     g.addRealEdge('E5', 'E7',2.4);
-    g.addRealEdge('E5', 'E8',19.4);
-    g.addRealEdge('E8', 'E9',8.2);
+    g.addRealEdge('E5', 'E8',30);
+    g.addRealEdge('E8', 'E9',9.6);
     g.addRealEdge('E8', 'E12',6.4);
-    g.addRealEdge('E9','E11',11.2);
+    g.addRealEdge('E9','E11',12.2);
     g.addRealEdge('E13','E14',5.1);
 }
 
@@ -295,49 +300,53 @@ function addDirectEdges(g) {
 function aStar(g, s, e){
     let heap = new MinHeap();
 
+    // Check o começo
+    g.checkVertex(s);
+
+    // Nodes que eu posso chegar a partir do começo.
     let fronteiras = g.getAdjacentNodes(s);
+    console.log(fronteiras);
 
     for(const p of fronteiras){
         // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
         if(!g.getCheckVertex(p.destiny)){
             // Marca esse como inserido na Heap
             g.checkVertex(p.destiny);
-            // Coloca na Heap um node que tem o Weight real + o direto (dessa forma eu não tenho o valor do nó pai)
-            heap.insert(new Node(p.destiny, g.getRealDistance(s, p.destiny), g.getDirectDistance(s, p.destiny))); 
+            heap.insert(new Node(p.destiny, g.getDirectDistance(s, p.destiny), g.getRealDistance(s, p.destiny))); 
             //console.log(heap);
         }
     }
-     //console.log(heap);
-     while(heap.size() >= 1 && heap.heap[1].destiny != e){
-         //console.log(heap);
-         let a = heap.remove();
-         //console.log('indo para ' + a.destiny);
-         n = g.getVertex(a.destiny);
-         n.checked = true;
-         for(const p of n.nodes){
-             // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
-             if(/*!heap.contains(p.destiny) && */g.getVertex(p.destiny).checked!=true){
-                 // Marca esse como inserido na Heap, e insere
-                 g.getVertex(p.destiny).checked = true;
-                 heap.insert(new Edge(p.destiny, p.weight+a.weight, p.weight+p.realDistance));
- 
-                 // Aqui, na hora de inserir p, eu tenho que na verdade inserir um node nesses seguintes valores:
-                 // W, que seria o peso pra chegar até ele (o W do pai dele + do pai dele até ele)
-                 // X, que seria a distancia real + a distancia direta (nesse caso, weight = direta, realDistance = real)
-                 // Fazendo assim, na hora de comparar os pesos da Heap, é pra usar a soma dessas duas ai em cima, ao invés 
-                 // de weight.
-                 
-                 // Ideia é que essa realDistance seja do node atual pra o Final.
-                 // Por isso, preciso salvar as ditâncias diretas pra o final. Como?
- 
-                 // Posso refazer o grafo pra guardar de todos os nodes pra todos os nodes, mas a distância real eu deixo
-                 // undefined pra as estações que não têm caminhos entre si
- 
-                 // Na verdade, eu vou reescrever o código do grafo pra ter 2 maps: Um com a distância real, e um com a
-                 // distância direta.
-             }
-         }
-     }
+     // Enquanto o tamanho da Heap for maior do que 0, ou TALVEZ (não sei) não chegou no destino
+    let a = 0;
+    while(heap.size() >= 1 && heap.heap[1].destiny != e && a != 5){
+        // atual vai ser um NODE tirado da Heap (preciso ver essa porra de Node != Edge)
+        let atual = heap.remove();
+        a++;
+        console.log('indo para ' + atual.destiny);
+
+        g.checkVertex(atual.destiny);
+
+        fronteiras = g.getAdjacentNodes(atual.destiny);
+
+        for(const p of fronteiras){
+            // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
+            if(/*!heap.contains(p.destiny) && */!g.getCheckVertex(p.destiny)){
+                // Marca esse como inserido na Heap, e insere
+                g.checkVertex(p.destiny);
+                // Talvez isso ^ não esteja correto
+
+                // Nesse novo NODE eu vou colocar a distância direta desse P pra o FIM, E
+                // O valor salvo em atual, mais a distância de atual pra o que eu tô vendo agora
+                //console.log(`De ${atual.destiny} pra ${p.destiny}: ${g.getRealDistance(atual.destiny, p.destiny)}`);
+                heap.insert(new Node(p.destiny, g.getDirectDistance(p.destiny,e), g.getRealDistance(atual.destiny,p.destiny) + atual.h));
+                
+                // Tem algo errado com a função heurística. Quando eu saio de E7 eu vou pra E4. Tudo certo.
+                // Mas aí, E3 fica com o valor maior que E13, o que não era pra acontecer
+
+            }
+        }
+        console.log(heap);
+    }
      //console.log(heap);
  }
 
@@ -348,7 +357,7 @@ for(let x = 1; x <= 14; x++){
 addMetroEdges(metro);
 addDirectEdges(metro);
 
-//aStar(metro, 'E3', 'E2');
+//aStar(metro, 'E12', 'E6');
 aStar(metro, 'E6', 'E13');
 
 //metro.printGraph();
