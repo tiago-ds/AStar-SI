@@ -31,7 +31,7 @@ class Graph{
         var edg1 = new Edge(v, weight, r);
         var edg2 = new Edge(w, weight, r);
 
-        // Os dois comandos pois o grafo é não direcional
+        // Os dois comandos pois o grafo é não-direcional
         this.list.get(v).nodes.push(edg2); // Adicionar A em B 
         this.list.get(w).nodes.push(edg1); // E adicionar B em A
     }
