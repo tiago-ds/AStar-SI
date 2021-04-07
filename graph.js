@@ -31,12 +31,10 @@ class Graph{
         this.edgeMap.get(vertexOrigin).push(originToDestiny);
     }
 
-    // Função simples que retorna o vértice tanto no Map de distâncias diretas, quanto reais;
     getVertexEdges(vertexName){
         return this.edgeMap.get(vertexName);
     }
 
-    // Função que retorna a distância real de V até W
     getRealDistance(vertexOrigin, vertexDestiny){
         if(vertexOrigin == vertexDestiny) return 0;
         else{
@@ -50,7 +48,6 @@ class Graph{
         }
     }
 
-    // Função que retorna a distância direta de V até W
     getDirectDistance(vertexOrigin, vertexDestiny){
         if(vertexOrigin == vertexDestiny) return 0;
         else{
@@ -62,5 +59,13 @@ class Graph{
             }
             return directDistance;
         }
+    }
+
+    getVertexFrontier(vertexName){
+        return this.vertexMap.get(vertexName).frontier;
+    }
+
+    updateVertexFrontier(vertexName, newFrontier){
+        this.vertexMap.get(vertexName).frontier = newFrontier;
     }
 }
