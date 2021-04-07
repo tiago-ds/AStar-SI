@@ -1,195 +1,83 @@
-class Edge{
-    constructor(v, w, r){
-        this.destiny = v;
-        this.weight = w;
-        this.realDistance = r;
-    }
-}
-
-class Node{
-    constructor(d, v){
-        this.destiny = d;
-        this.funct = v;
-    }
-}
-
 class Graph{
-    constructor(n){
-        this.size = n;
-        this.list = new Map();
+    constructor(){
+        this.realDistance = new Map();
+        this.directDistance = new Map();
     }
 
-    addVertex(v){
-        this.list.set(v, {checked:false, nodes:[]});
+    addVertex(vertexName){
+        this.realDistance.set(vertexName, {checked:false, nodes:[]});
+        this.directDistance.set(vertexName, []);
     }
 
-    addEdge(v, w, weight, r){
-        if(!this.list.has(v) && !this.list.has(w))
+    // Função simples pra marcar o node como visitado
+    checkVertex(vertexDestiny){
+        this.realDistance.get(vertexDestiny).checked = true;
+    }
+
+    // Função simples pra ver se o node já foi visitado
+    getCheckVertex(vertexName){
+        return this.realDistance.get(vertexName).checked;
+    }
+
+    getAdjacentNodes(vertexName){
+        // Retorna um Array com os nodes que esse node faz fronteira
+        return this.realDistance.get(vertexName).nodes;
+    }
+
+    // Adiciona um caminho de V até W no Map de distâncias reais
+    addRealEdge(vertexOrigin, vertexDestiny, weight){
+        if(!this.realDistance.has(vertexOrigin) && !this.realDistance.has(vertexDestiny))
             return; // Não pode adicionar um caminho pra nodes que não existem
 
         // Criar a referência ao caminho
-        var edg1 = new Edge(v, weight, r);
-        var edg2 = new Edge(w, weight, r);
+        var edg1 = new GraphNode(vertexOrigin, weight, null);
+        var edg2 = new GraphNode(vertexDestiny, weight, null);
 
-        // Os dois comandos pois o grafo é não-direcional
-        this.list.get(v).nodes.push(edg2); // Adicionar A em B 
-        this.list.get(w).nodes.push(edg1); // E adicionar B em A
+        // Os dois comandos pois o grafo é não direcional
+        // .nodes porque agora é um array de objetos, com a propriedade "nodes", além da "checked"
+        this.realDistance.get(vertexOrigin).nodes.push(edg2); // Adicionar A em B 
+        this.realDistance.get(vertexDestiny).nodes.push(edg1); // E adicionar B em A
     }
 
-    getVertex(v){
-        return this.list.get(v);
+    // Adiciona um caminho de V até W no Map de distâncias diretas
+    addDirectEdge(vertexOrigin, vertexDestiny, weight){
+        if(!this.directDistance.has(vertexOrigin) && !this.directDistance.has(vertexDestiny))
+            return;
+
+        var edg1 = new GraphNode(vertexOrigin, weight, null);
+        var edg2 = new GraphNode(vertexDestiny, weight, null);
+
+        this.directDistance.get(vertexOrigin).push(edg2);
+        this.directDistance.get(vertexDestiny).push(edg1);
     }
 
-    printGraph(){
-        console.log(this.list);
+    // Função simples que retorna o vértice tanto no Map de distâncias diretas, quanto reais;
+    getVertex(vertexName){
+        return {real:this.realDistance.get(vertexName), direct:this.directDistance.get(vertexName)};
     }
 
-}
-
-function addMetroEdges(g){
-    g.addEdge('E1','E2',10,10);
-    g.addEdge('E2','E3',8.5,8.5);
-    g.addEdge('E2','E9',10,10);
-    g.addEdge('E2','E10',3.5,3.5);
-    g.addEdge('E3','E4',6.3,6.3);
-    g.addEdge('E3','E9',9.4,9.4);
-    g.addEdge('E3','E13',12.1,18.7);
-    g.addEdge('E4','E5',12,13);
-    g.addEdge('E4','E8',12.4,15.3);
-    g.addEdge('E4','E13',10.6,12.8);
-    g.addEdge('E5', 'E6',3,3);
-    g.addEdge('E5', 'E7',2.4,2.4);
-    g.addEdge('E5', 'E8',19.4,30);
-    g.addEdge('E8', 'E9',8.2,9.6);
-    g.addEdge('E8', 'E12',6.4,6.4);
-    g.addEdge('E9','E11',11.2,12.2);
-    g.addEdge('E13','E14',5.1,5.1);
-}
-
-class MinHeap {
-
-    constructor () {
-        this.heap = [null];
-    }
-    size(){
-        return this.heap.length - 1;
-    }
-    insert(e) {
-        this.heap.push(e);
-
-        if (this.heap.length > 1) {
-            let current = this.heap.length - 1;
-
-            while (current > 1 && this.heap[Math.floor(current/2)].weight > this.heap[current].weight) {
-                [this.heap[Math.floor(current/2)], this.heap[current]] = [this.heap[current], this.heap[Math.floor(current/2)]];
-                current = Math.floor(current/2);
-            }
-        }
-    }
-    
-    remove() {
-        let smallest = this.heap[1];
-
-        if (this.heap.length > 2) {
-            this.heap[1] = this.heap[this.heap.length-1];
-            this.heap.splice(this.heap.length - 1);
-
-            if (this.heap.length === 3) {
-                if (this.heap[1].weight > this.heap[2].weight) {
-                    [this.heap[1], this.heap[2]] = [this.heap[2], this.heap[1]];
+    // Função que retorna a distância real de V até W
+    getRealDistance(vertexOrigin, vertexDestiny){
+        if(vertexOrigin == vertexDestiny) return 0;
+        else{
+            let r = Infinity;
+            for(const p of this.getVertex(vertexOrigin).real.nodes){
+                if(p.destiny == vertexDestiny){
+                    r = p.directDistance;
                 }
-                return smallest;
             }
-
-            let current = 1;
-            let leftChildIndex = current * 2;
-            let rightChildIndex = current * 2 + 1;
-
-            while (this.heap[leftChildIndex] &&
-                    this.heap[rightChildIndex] &&
-                    (this.heap[current].weight > this.heap[leftChildIndex].weight ||
-                        this.heap[current].weight > this.heap[rightChildIndex].weight)) {
-                if (this.heap[leftChildIndex].weight < this.heap[rightChildIndex].weight) {
-                    [this.heap[current], this.heap[leftChildIndex]] = [this.heap[leftChildIndex], this.heap[current]];
-                    current = leftChildIndex;
-                } else {
-                    [this.heap[current], this.heap[rightChildIndex]] = [this.heap[rightChildIndex], this.heap[current]];
-                    current = rightChildIndex;
-                }
-
-                leftChildIndex = current * 2
-                rightChildIndex = current * 2 + 1
-            }
-        }
-        else if (this.heap.length === 2) {
-            this.heap.splice(1, 1);
-        }else {
-            return null;
-        }
-        return smallest;
-    }
-
-    contains(v){
-        for(let x = 1; x < this.heap.length; x++){
-            if(this.heap[x].destiny == v)
-                return true;
-        }
-        return false;
-    }
-}
-
-
-function aStar(g, s, e){
-   let heap = new MinHeap();
-    n = g.getVertex(s);
-    n.checked = true;
-    for(const p of n.nodes){
-        // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
-        if(/*acho que isso não precisa!heap.contains(p.destiny) &&*/ g.getVertex(p.destiny).checked!=true){
-            // Marca esse como inserido na Heap, e insere
-            g.getVertex(p.destiny).checked = true;
-            heap.insert(new Edge(p.destiny, p.weight, p.weight+p.realDistance));
+            return r;
         }
     }
-    console.log(heap);
-    while(heap.size() >= 1 && heap.heap[1].destiny != e){
-        console.log(heap);
-        let a = heap.remove();
-        console.log('indo para ' + a.destiny);
-        n = g.getVertex(a.destiny);
-        n.checked = true;
-        for(const p of n.nodes){
-            // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
-            if(/*!heap.contains(p.destiny) && */g.getVertex(p.destiny).checked!=true){
-                // Marca esse como inserido na Heap, e insere
-                g.getVertex(p.destiny).checked = true;
-                heap.insert(new Edge(p.destiny, p.weight+a.weight, p.weight+p.realDistance));
 
-                // Aqui, na hora de inserir p, eu tenho que na verdade inserir um node nesses seguintes valores:
-                // W, que seria o peso pra chegar até ele (o W do pai dele + do pai dele até ele)
-                // X, que seria a distancia real + a distancia direta (nesse caso, weight = direta, realDistance = real)
-                // Fazendo assim, na hora de comparar os pesos da Heap, é pra usar a soma dessas duas ai em cima, ao invés 
-                // de weight.
-                
-                // Ideia é que essa realDistance seja do node atual pra o Final.
-                // Por isso, preciso salvar as ditâncias diretas pra o final. Como?
-
-                // Posso refazer o grafo pra guardar de todos os nodes pra todos os nodes, mas a distância real eu deixo
-                // undefined pra as estações que não têm caminhos entre si
-
-                // Na verdade, eu vou reescrever o código do grafo pra ter 2 maps: Um com a distância real, e um com a
-                // distância direta.
+    // Função que retorna a distância direta de V até W
+    getDirectDistance(vertexOrigin, vertexDestiny){
+        if(vertexOrigin == vertexDestiny) return 0;
+        else{
+            for(const p of this.getVertex(vertexDestiny).direct){
+                if(p.destiny == vertexOrigin)
+                    return p.directDistance;
             }
         }
     }
-    console.log(heap);
 }
-
-metro = new Graph(14);
-for(let x = 1; x <= 14; x++){
-    metro.addVertex('E'+ x);
-}
-addMetroEdges(metro);
-//metro.printGraph();
-
-aStar(metro, 'E6', 'E13');
