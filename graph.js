@@ -1,72 +1,52 @@
 class Graph{
     constructor(){
-        this.realDistance = new Map();
-        this.directDistance = new Map();
+        this.vertexMap = new Map();
+        this.edgeMap = new Map();
     }
 
     addVertex(vertexName){
-        this.realDistance.set(vertexName, {checked:false, nodes:[]});
-        this.directDistance.set(vertexName, []);
+        let vertex = new Vertex(vertexName);
+        this.vertexMap.set(vertexName, vertex);
+        this.edgeMap.set(vertexName, []);
     }
 
-    // Função simples pra marcar o node como visitado
-    checkVertex(vertexDestiny){
-        this.realDistance.get(vertexDestiny).checked = true;
+    visitVertex(vertexName){
+        this.vertexMap.get(vertexName).visited = true;
     }
 
-    // Função simples pra ver se o node já foi visitado
-    getCheckVertex(vertexName){
-        return this.realDistance.get(vertexName).checked;
+    isVertexVisited(vertexName){
+        return this.vertexMap.get(vertexName).visited;
     }
 
-    getAdjacentNodes(vertexName){
-        // Retorna um Array com os nodes que esse node faz fronteira
-        return this.realDistance.get(vertexName).nodes;
+    getAdjacentEdges(vertexName){
+        return this.edgeMap.get(vertexName).filter((edge) => {if(edge.realDistance != null) return edge});
     }
 
-    // Adiciona um caminho de V até W no Map de distâncias reais
-    addRealEdge(vertexOrigin, vertexDestiny, weight){
-        if(!this.realDistance.has(vertexOrigin) && !this.realDistance.has(vertexDestiny))
-            return; // Não pode adicionar um caminho pra nodes que não existem
-
-        // Criar a referência ao caminho
-        var edg1 = new GraphNode(vertexOrigin, weight, null);
-        var edg2 = new GraphNode(vertexDestiny, weight, null);
-
-        // Os dois comandos pois o grafo é não direcional
-        // .nodes porque agora é um array de objetos, com a propriedade "nodes", além da "checked"
-        this.realDistance.get(vertexOrigin).nodes.push(edg2); // Adicionar A em B 
-        this.realDistance.get(vertexDestiny).nodes.push(edg1); // E adicionar B em A
-    }
-
-    // Adiciona um caminho de V até W no Map de distâncias diretas
-    addDirectEdge(vertexOrigin, vertexDestiny, weight){
-        if(!this.directDistance.has(vertexOrigin) && !this.directDistance.has(vertexDestiny))
+    addEdge(vertexOrigin, vertexDestiny, realDistance, directDistance, color){
+        if(!this.vertexMap.has(vertexOrigin) && !this.vertexMap.has(vertexDestiny))
             return;
 
-        var edg1 = new GraphNode(vertexOrigin, weight, null);
-        var edg2 = new GraphNode(vertexDestiny, weight, null);
+        var originToDestiny = new Edge(vertexOrigin, vertexDestiny, realDistance, directDistance, color);
 
-        this.directDistance.get(vertexOrigin).push(edg2);
-        this.directDistance.get(vertexDestiny).push(edg1);
+        this.edgeMap.get(vertexOrigin).push(originToDestiny);
     }
 
     // Função simples que retorna o vértice tanto no Map de distâncias diretas, quanto reais;
-    getVertex(vertexName){
-        return {real:this.realDistance.get(vertexName), direct:this.directDistance.get(vertexName)};
+    getVertexEdges(vertexName){
+        return this.edgeMap.get(vertexName);
     }
 
     // Função que retorna a distância real de V até W
     getRealDistance(vertexOrigin, vertexDestiny){
         if(vertexOrigin == vertexDestiny) return 0;
         else{
-            let r = Infinity;
-            for(const p of this.getVertex(vertexOrigin).real.nodes){
-                if(p.destiny == vertexDestiny){
-                    r = p.directDistance;
+            let realDistance;
+            for(const edge of this.getVertexEdges(vertexOrigin)){
+                if(edge.vertexDestiny == vertexDestiny){
+                    realDistance = edge.realDistance;
                 }
             }
-            return r;
+            return realDistance;
         }
     }
 
@@ -74,10 +54,13 @@ class Graph{
     getDirectDistance(vertexOrigin, vertexDestiny){
         if(vertexOrigin == vertexDestiny) return 0;
         else{
-            for(const p of this.getVertex(vertexDestiny).direct){
-                if(p.destiny == vertexOrigin)
-                    return p.directDistance;
+            let directDistance;
+            for(const edge of this.getVertexEdges(vertexOrigin)){
+                if(edge.vertexDestiny == vertexDestiny){
+                    directDistance = edge.directDistance;
+                }
             }
+            return directDistance;
         }
     }
 }
