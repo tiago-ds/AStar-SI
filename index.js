@@ -1,40 +1,50 @@
-console.log(data);
-
-let heap;
-
 function aStar(graph, startVertex, endVertex){
 
-    heap = new MinHeap();
+    let heap = new MinHeap();
 
     graph.visitVertex(startVertex);
 
     let fronteiras = graph.getAdjacentEdges(startVertex);
-    // console.log(fronteiras);
     
     for(const edge of fronteiras){
             graph.visitVertex(edge.vertexDestiny);
-            heap.insert(edge);
+            let directDistance = graph.getDirectDistance(startVertex , edge.vertexDestiny);
+            let realDistance = graph.getRealDistance(startVertex , edge.vertexDestiny);
+            graph.updateVertexFrontier(edge.vertexDestiny, 1);
+            helperEdge = new Edge(startVertex, edge.vertexDestiny, realDistance, directDistance);
+            heap.insert(helperEdge);
     }
 
-    // let fronteiraCounter;
+    let fronteiraCounter;
+    let caminho = [new Vertex(startVertex)]
     
     let atual = null;
     while(heap.size() >= 1 && (atual == null || atual.vertexDestiny != endVertex)){
         const arr = [...heap.heap];
         console.log(arr);
         atual = heap.remove();
-        //caminho.splice(atual.fronteira);
-        //caminho.push(atual);
-        console.log('indo para ' + atual.vertexDestiny);
-        fronteiraCounter = atual.fronteira + 1;
-        graph.visitVertex(atual.vertexDestiny);
 
+
+        let currentFrontier = graph.getVertexFrontier(atual.vertexDestiny);
+        caminho.splice(currentFrontier);
+        caminho.push(new Vertex(atual.vertexDestiny));
+        fronteiraCounter = currentFrontier + 1;
+        console.log(caminho);
+
+
+        console.log('indo para ' + atual.vertexDestiny);
+        graph.visitVertex(atual.vertexDestiny);
         fronteiras = graph.getAdjacentEdges(atual.vertexDestiny);
-        
         for(const edge of fronteiras){
-            if(/*!heap.contains(p.destiny) && */!graph.isVertexVisited(edge.vertexDestiny)){
+            if(!graph.isVertexVisited(edge.vertexDestiny)){
                 graph.visitVertex(edge.vertexDestiny);
-                heap.insert(edge);
+
+                graph.updateVertexFrontier(edge.vertexDestiny, fronteiraCounter);
+
+                let directDistance = graph.getDirectDistance(edge.vertexDestiny, endVertex);
+                let realDistance = graph.getRealDistance(atual.vertexDestiny, edge.vertexDestiny) + atual.realDistance;
+                helperEdge = new Edge(atual.vertexDestiny, edge.vertexDestiny, realDistance, directDistance);
+                heap.insert(helperEdge);
             }
         }
     }
@@ -65,5 +75,5 @@ console.log(metro.getAdjacentEdges('E4'));
 // addDirectEdges(metro);
 
 
-aStar(metro, 'E1', 'E12');
+console.log(aStar(metro, 'E6', 'E12'));
 // console.log(metro.realDistance);
