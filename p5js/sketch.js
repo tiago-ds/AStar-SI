@@ -38,7 +38,7 @@ function calculateAstar(){
 
 	// Chamada do AStar
 	caminho = aStar(metro, start, end);
-
+	//console.log(caminho);
 	// String para o caminho
 	res = 'Caminho percorrido: ';
 
@@ -52,6 +52,8 @@ function calculateAstar(){
 	// Gambiarra pra desenhar o caminho;
 	if (start === 'E6' && end === 'E13') {
 		flag = true;
+	}else{
+		flag = false;
 	}
 	// Referência ao campo do resultado
 	campoResultado.innerHTML = res;
@@ -155,9 +157,9 @@ function E4toE13() {
 }
 function drawCaminho(){
 	console.log('aa');
-	r5.draw(color(206, 79, 70));
-	r4.draw(color(206, 79, 70));
-	r17.draw(color(206, 79, 70));
+	r5.draw(color(0));
+	r4.draw(color(0));
+	r17.draw(color(0));
 }
 
 function setup() {
@@ -218,23 +220,23 @@ function drawStations(){
 }
 
 function drawRails(){
-	r1.draw(color(0,0,0));
-	r2.draw(color(0,0,0));
-	r3.draw(color(0,0,0));
-	r4.draw(color(0,0,0));
-	r5.draw(color(0,0,0));
-	r6.draw(color(0,0,0));
-	r7.draw(color(0,0,0));
-	r8.draw(color(0,0,0));
-	r9.draw(color(0,0,0));
-	r10.draw(color(0,0,0));
-	r11.draw(color(0,0,0));
-	r12.draw(color(0,0,0));
-	r13.draw(color(0,0,0));
-	r14.draw(color(0,0,0));
-	r15.draw(color(0,0,0));
-	r16.draw(color(0,0,0));
-	r17.draw(color(0,0,0));
+	r1.draw(color(10,0,200));
+	r2.draw(color(10,0,200));
+	r3.draw(color(10,0,200));
+	r4.draw(color(10,0,200));
+	r5.draw(color(10,0,200));
+	r6.draw(color(255,211,25));
+	r7.draw(color(255,211,25));
+	r8.draw(color(255,211,25));
+	r9.draw(color(255,211,25));
+	r10.draw(color(255,211,25));
+	r11.draw(color(250,10,10));
+	r12.draw(color(50,250,50));
+	r13.draw(color(250,10,10));
+	r14.draw(color(50,250,50));
+	r15.draw(color(250,10,10));
+	r16.draw(color(50,250,50));
+	r17.draw(color(50,250,50));
 }
 
 function draw() {

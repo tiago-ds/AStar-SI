@@ -121,7 +121,8 @@ let heap;
 
 // A função AStar. G é o grafo, S é o vértice inicial, e E é o vértice final;
 function aStar(g, s, e){
-
+    //Questões de debug
+    console.log('Começando');
     // Uma condição básica para caso o Node inicial seja o mesmo que o final.
     // Nesse caso, ele vai retornar um array de tamanho 1, com o node inicial.
     if(s == e){
@@ -139,8 +140,7 @@ function aStar(g, s, e){
     
     // Aqui é checado cada node no qual o início faz fronteira, e coloca eles na heap;
     for(const p of fronteiras){
-        // Se o destino não estiver na Heap (como é a primeira iteração, não vai estar)
-        // Marca esse como inserido na Heap
+        // Marca esse como inserido na Heap, e o insere
         g.checkVertex(p.destiny);
         heap.insert(new GraphNode(p.destiny, g.getDirectDistance(p.destiny, e), g.getRealDistance(s, p.destiny), 1, p.cor));
     }
@@ -164,9 +164,9 @@ function aStar(g, s, e){
         caminho.splice(atual.fronteira);
         caminho.push(atual);
 
-        console.log('indo para ' + atual.destiny);
+        console.log('Checando em ' + atual.destiny);
 
-        // Ele aumenta um "nível" do valor citado na linha 163;
+        // Ele aumenta um "nível" do valor citado na linha 160;
         fronteiraCounter = atual.fronteira + 1;
 
         // Marca o vértice atual;
@@ -177,14 +177,13 @@ function aStar(g, s, e){
         
         // Para cada vértice com o qual ele faz fronteira, ele vai checar a inserção na heap;
         for(const p of fronteiras){
-            // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap;
+            // Não estiver marcado no grafo, ele coloca esse node na heap;
             if(!g.getCheckVertex(p.destiny)){
                 // Marca esse como inserido na Heap, e o insere;
                 g.checkVertex(p.destiny);
 
                 // Nesse new Node, é colocado a distância direta desse P pra o FIM, e
                 // o valor salvo na variável "atual", mais a distância de "atual" pra o que eu está sendo checado agora;
-                //console.log(p.cor)
                 heap.insert(new GraphNode(p.destiny, g.getDirectDistance(p.destiny,e), g.getRealDistance(atual.destiny,p.destiny) + atual.realDistance, fronteiraCounter, p.cor));
             }
         }
