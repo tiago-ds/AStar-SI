@@ -4,8 +4,8 @@ class Graph{
         this.edgeMap = new Map();
     }
 
-    addVertex(vertexName){
-        let vertex = new Vertex(vertexName);
+    addVertex(vertexName, posX, posY){
+        let vertex = new Vertex(vertexName, posX, posY);
         this.vertexMap.set(vertexName, vertex);
         this.edgeMap.set(vertexName, []);
     }
@@ -22,11 +22,21 @@ class Graph{
         return this.edgeMap.get(vertexName).filter((edge) => {if(edge.realDistance != null) return edge});
     }
 
+    getEdge(vertexOrigin, vertexDestiny){
+        return this.edgeMap.get(vertexOrigin).filter((edge) => {if(edge.vertexDestiny == vertexDestiny) return edge});
+    }
+
+    getVertex(vertexName){
+        return this.vertexMap.get(vertexName);
+    }
+
     addEdge(vertexOrigin, vertexDestiny, realDistance, directDistance, color){
         if(!this.vertexMap.has(vertexOrigin) && !this.vertexMap.has(vertexDestiny))
             return;
+        let origin = this.getVertex(vertexOrigin);
+        let destiny = this.getVertex(vertexDestiny);
 
-        var originToDestiny = new Edge(vertexOrigin, vertexDestiny, realDistance, directDistance, color);
+        var originToDestiny = new Edge(vertexOrigin, vertexDestiny, origin, destiny, realDistance, directDistance, color);
 
         this.edgeMap.get(vertexOrigin).push(originToDestiny);
     }
