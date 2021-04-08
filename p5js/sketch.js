@@ -1,128 +1,247 @@
+// Referências às estações e aos caminhos;
+let station1,station2,station3,station4,station5,station6,station7,station8,station9,station10,station11,station12,station13,station14;
+let r1,r2,r3,r4,r5,r6,r7,r8,r9,r10,r11,r12,r13,r14,r15,r16,r17;
+
+// Referência ao grafo;
+var metro;
+
+// Referências ao HTML
+let inputInicial = window.document.getElementById('start');
+let inputFinal = window.document.getElementById('target');
+let calculateButton = window.document.getElementById('calculate');
+let campoResultado = window.document.getElementById('resultado');
+let campoTempo = window.document.getElementById('tempo');
+
+// Variável que vai armazenar o resultado
+let caminho;
+
+// Gambiarra pra desenhar o caminho pedido
+let flag = false;
+
+// Bindar o onClick à função
+calculateButton.onclick = calculateAstar;
+
+function calculateAstar(){
+	// Até a linha 30 é gerando o grafo do metrô
+	metro = new Graph(14);
+
+	for(let x = 1; x <= 14; x++){
+		metro.addVertex('E'+ x);
+	}
+
+	addMetroEdges(metro);
+	addDirectEdges(metro);
+
+	// Inputs do AStar
+	let start = 'E' + inputInicial.value;
+	let end = 'E' + inputFinal.value;
+
+	// Chamada do AStar
+	caminho = aStar(metro, start, end);
+
+	// String para o caminho
+	res = 'Caminho percorrido: ';
+
+	// Gerador de String para o Caminho
+	for(let x = 0; x < caminho.length - 1; x++){
+		res += caminho[x].destiny + ' > ';
+	}
+	// Último node do caminho
+	res+=caminho[caminho.length - 1].destiny;
+
+	// Gambiarra pra desenhar o caminho;
+	if (start === 'E6' && end === 'E13') {
+		flag = true;
+	}
+	// Referência ao campo do resultado
+	campoResultado.innerHTML = res;
+	campoResultado.style.display = "block";
+
+	// Duração em minutos, e a distância percorrida
+	let duracao = 0;
+	let distanciatotal = 0;
+
+	// Percorre o Array do Caminho, adicionando à distância, o valor da distância real
+	for(let x = 0; x < caminho.length; x++){
+		// Faz isso só para depois de x = 1, pois não há caminho anterior em x = 0
+		if(x > 0){
+			// Adiciona o valor à distância total
+			distanciatotal += metro.getRealDistance(caminho[x].destiny, caminho[x-1].destiny);
+			// Condição para mudança de linha
+			if(caminho[x].cor != caminho[x-1].cor){
+				// Adiciona 4 minutos à duração
+				duracao+=4;
+			}
+		}
+	}
+	// Fórmula para converter de km/h a minutos
+	let distanciaEmMinutos = (distanciatotal*60)/30;
+
+	// Adiciona à duração os minutos
+	duracao+=distanciaEmMinutos;
+
+	// Mostra o tempo no HTML
+	campoTempo.innerHTML = `Duração: ${duracao} minutos`;
+	campoTempo.style.display = "block";
+	
+	//console.log(duracao);
+}
+
+// Até a linha 132 são funções só pra desenhar as estações
+function E1toE2(){
+	line(27,228,142,267);
+}
+function E2toE3(){
+	line(142, 267, 238, 306);
+}
+function E3toE4(){
+	line(238, 306, 315, 325);
+}
+function E4toE5(){
+	line(450, 382, 434, 367);
+	line(434, 367, 315, 325);
+}
+function E5toE6(){
+	line(450, 382, 469, 411);
+}
+function E5toE7(){
+	line(450, 382, 430, 402);
+}
+function E5toE8(){
+	line(450, 382, 473, 367);
+	line(473, 367, 486, 311);
+	line(486, 311, 417, 229);
+	line(417, 229, 418, 188);
+	line(418, 188, 402, 173);
+	line(402, 173, 334, 174);
+}
+function E8toE9(){
+	line(334, 174, 255, 175);
+	line(255, 175, 238, 190);
+}
+function E9toE2(){
+	line(238, 190, 142, 267);
+}
+function E9toE3(){
+	line(238, 190, 238, 306);
+}
+function E2toE10(){
+	line(142, 267, 114, 296);
+}
+function E4toE8(){
+	line(315, 325, 360, 184);
+	line(360, 184, 334, 174);
+}
+function E3toE13(){
+	line(238, 306, 239, 375);
+	line(239, 375, 262, 402);
+	line(262, 402, 243, 428);
+	line(243, 428, 286, 449);
+}
+function E13toE14(){
+	line(286, 449, 267, 507);
+}
+function E9toE11(){
+	line(238, 190, 236, 158);
+	line(236, 158, 162, 75);
+}
+function E8toE12() {
+	line(334, 174, 334, 93);
+}
+function E4toE13() {
+	line(315, 325, 300, 375);
+	line(300, 375, 309, 380);
+	line(309, 380, 286, 449);
+}
+function drawCaminho(){
+	console.log('aa');
+	r5.draw(color(206, 79, 70));
+	r4.draw(color(206, 79, 70));
+	r17.draw(color(206, 79, 70));
+}
+
 function setup() {
-	createCanvas(800, 800);
-	caminho = aStar(metro, 'E11', 'E6');
-    console.log(caminho);
+	createCanvas(582, 582);
+	//caminho = aStar(metro, 'E1', 'E13');
 
-    grid = new Map();
+	//Inicializar as estações//
+	station1 = new Station('E1', 27, 228);
+	station2 = new Station('E2', 142, 267);
+	station3 = new Station('E3', 238, 306);
+	station4 = new Station('E4', 315, 325);
+	station5 = new Station('E5', 450, 382);
+	station6 = new Station('E6', 469, 411);
+	station7 = new Station('E7', 430, 402);
+	station8 = new Station('E8', 334, 174);
+	station9 = new Station('E9', 238, 190);
+	station10 = new Station('E10', 114, 296);
+	station11 = new Station('E11', 162, 75);
+	station12 = new Station('E12', 334, 93);
+	station13 = new Station('E13', 286, 449);
+	station14 = new Station('E14', 267, 507); 
 
-	e1Station = new Station("E1", 100, 300);
-    grid.set(e1Station.name, e1Station);
-	e2Station = new Station("E2", 180, 370);
-    grid.set(e2Station.name, e2Station);
-	e3Station = new Station("E3", 330, 450);
-    grid.set(e3Station.name, e3Station);
-	e4Station = new Station("E4", 420, 490);
-    grid.set(e4Station.name, e4Station);
-	e5Station = new Station("E5", 620, 530);
-    grid.set(e5Station.name, e5Station);
-	e6Station = new Station("E6", 640, 600);
-    grid.set(e6Station.name, e6Station);
-	e7Station = new Station("E7", 590, 580);
-    grid.set(e7Station.name, e7Station);
-	e8Station = new Station("E8", 450, 170);
-    grid.set(e8Station.name, e8Station);
-	e9Station = new Station("E9", 300, 200);
-    grid.set(e9Station.name, e9Station);
-	e10Station = new Station("E10", 130, 430);
-    grid.set(e10Station.name, e10Station);
-	e11Station = new Station("E11", 200, 50);
-    grid.set(e11Station.name, e11Station);
-	e12Station = new Station("E12", 450, 70);
-    grid.set(e12Station.name, e12Station);
-	e13Station = new Station("E13", 400, 620);
-    grid.set(e13Station.name, e13Station);
-	e14Station = new Station("E14", 350, 670);
-    grid.set(e14Station.name, e14Station);
+	//Inicializar os cmainhos no desenho//
+	r1 = new Rail('E1', 'E2', E1toE2);
+	r2 = new Rail('E2', 'E3', E2toE3);
+	r3 = new Rail('E3', 'E4', E3toE4);
+	r4 = new Rail('E4', 'E5', E4toE5);
+	r5 = new Rail('E5', 'E6', E5toE6);
+	r6 = new Rail('E5', 'E7', E5toE7);
+	r7 = new Rail('E5', 'E8', E5toE8);
+	r8 = new Rail('E8', 'E9', E8toE9);
+	r9 = new Rail('E9', 'E2', E9toE2);
+	r10 = new Rail('E2', 'E10', E2toE10);
+	r11 = new Rail('E9', 'E3', E9toE3);
+	r12 = new Rail('E4', 'E8', E4toE8);
+	r13 = new Rail('E3', 'E13', E3toE13);
+	r14 = new Rail('E13', 'E14', E13toE14);
+	r15 = new Rail('E9', 'E11', E9toE11);
+	r16 = new Rail('E8', 'E12', E8toE12);
+	r17 = new Rail('E4', 'E13', E4toE13);
+}
 
+function drawStations(){
+	station1.draw();
+	station2.draw();
+	station3.draw();
+	station4.draw();
+	station5.draw();
+	station6.draw();
+	station7.draw();
+	station8.draw();
+	station9.draw();
+	station10.draw();
+	station11.draw();
+	station12.draw();
+	station13.draw();
+	station14.draw();
+}
 
-	rail1 = new Rail(e1Station, e2Station);
-	rail2 = new Rail(e2Station, e10Station);
-	rail3 = new Rail(e2Station, e9Station);
-	rail4 = new Rail(e2Station, e3Station);
-	rail5 = new Rail(e9Station, e11Station);
-	rail6 = new Rail(e3Station, e4Station);
-	rail7 = new Rail(e3Station, e13Station);
-	rail8 = new Rail(e3Station, e9Station);
-	rail9 = new Rail(e13Station, e14Station);
-	rail10 = new Rail(e4Station, e13Station);
-	rail11 = new Rail(e4Station, e8Station);
-	rail12 = new Rail(e4Station, e5Station);
-	rail13 = new Rail(e8Station, e9Station);
-	rail14 = new Rail(e8Station, e12Station);
-	rail15 = new Rail(e8Station, e5Station);
-	rail16 = new Rail(e5Station, e6Station);
-	rail17 = new Rail(e5Station, e7Station);
-
-
+function drawRails(){
+	r1.draw(color(0,0,0));
+	r2.draw(color(0,0,0));
+	r3.draw(color(0,0,0));
+	r4.draw(color(0,0,0));
+	r5.draw(color(0,0,0));
+	r6.draw(color(0,0,0));
+	r7.draw(color(0,0,0));
+	r8.draw(color(0,0,0));
+	r9.draw(color(0,0,0));
+	r10.draw(color(0,0,0));
+	r11.draw(color(0,0,0));
+	r12.draw(color(0,0,0));
+	r13.draw(color(0,0,0));
+	r14.draw(color(0,0,0));
+	r15.draw(color(0,0,0));
+	r16.draw(color(0,0,0));
+	r17.draw(color(0,0,0));
 }
 
 function draw() {
-	background(220);
-
-	rail1.draw(1);
-	rail2.draw(1);
-	rail3.draw(1);
-	rail4.draw(1);
-	rail5.draw(1);
-	rail6.draw(1);
-	rail7.draw(1);
-	rail8.draw(1);
-	rail9.draw(1);
-	rail10.draw(1);
-	rail11.draw(1);
-	rail12.draw(1);
-	rail13.draw(1);
-	rail14.draw(1);
-	rail15.draw(1);
-	rail16.draw(1);
-	rail17.draw(1);
-
-    for (let index = 0; index < caminho.length-1; index++) {
-
-        tempA = grid.get(caminho[index].destiny);
-        tempB = grid.get(caminho[index+1].destiny);
-        tempRail = new Rail(tempA, tempB);
-        tempRail.draw(3);
-    }
-    strokeWeight(1);
-
-	e1Station.draw();
-	e2Station.draw();
-	e3Station.draw();
-	e4Station.draw();
-	e5Station.draw();
-	e6Station.draw();
-	e7Station.draw();
-	e8Station.draw();
-	e9Station.draw();
-	e10Station.draw();
-	e11Station.draw();
-	e12Station.draw();
-	e13Station.draw();
-	e14Station.draw();
-
-    
-
-	// let randomX = Math.floor(Math.random() * 255);
-	// let randomY = Math.floor(Math.random() * 255);
-	// let randomZ = Math.floor(Math.random() * 255);
-	// station.draw();  rcle(200, 200, 25)
-
-	//   circle(100, 300, 25); //E1
-	//   circle(180, 370, 25); //E2
-	//   circle(330, 450, 25); //E3
-	//   circle(420, 490, 25); //E4
-	//   circle(620, 530, 25); //E5
-	//   circle(640, 600, 25); //E6
-	//   circle(590, 580, 25); //E7
-	//   circle(450, 170, 25); //E8
-	//   circle(300, 200, 25); //E9
-	//   circle(130, 430, 25); //E10
-	//   circle(200, 50, 25); //E11
-	//   circle(450, 70, 25); //E12
-	//   circle(400, 620, 25); //E13
-	//   circle(350, 670, 25); //E14
-
-	//line(50,100, 75, 125 6);
-	//fill(randomX, randomY, randomZ);
+	background(255);
+	drawRails();
+	if(flag){
+		drawCaminho();
+	}
+	drawStations();
 }

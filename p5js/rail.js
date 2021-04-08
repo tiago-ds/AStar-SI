@@ -1,11 +1,14 @@
 class Rail{
-    constructor(stationA, stationB){
+    constructor(stationA, stationB, desenhar){
         this.stationA = stationA;
         this.stationB = stationB;
+        this.desenhar = desenhar;
     }
 
-    draw(strk){
-        strokeWeight(strk);
-        line(this.stationA.posX, this.stationA.posY, this.stationB.posX, this.stationB.posY)
+    draw(color){
+        strokeWeight(3);
+        stroke(color);
+        this.desenhar();
     }
+    
 }

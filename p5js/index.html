@@ -1,4 +1,5 @@
-<!DOCTYPE html><html lang="en"><head>
+<!DOCTYPE html><html lang="en">
+  <head>
     <script src="./../graphNode.js"></script>
     <script src="./../minHeap.js"></script>
     <script src="./../graph.js"></script>
@@ -8,10 +9,22 @@
     <script src="./station.js"></script>
     <script src="./rail.js"></script>
     <link rel="stylesheet" type="text/css" href="style.css">
+    <link href=' http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <meta charset="utf-8">
-    <title>MEU GRAPHO</title>
+    <title>Meutrô de Paris</title>
   </head>
   <body>
-    <script src="sketch.js"></script>
-    <h1>GRAFOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO</h1>
+    <div class="menu">
+      <h1>Problema do Metrô de Paris</h1>
+      <hr />
+      <label for="start">Estação Inicial</label>
+      <input type="number" min="1" max="14" id="start"></input>
+      <label for="target">Estação Final</label>
+      <input type="number" min="1" max="14" id="target"></input>
+      <button type="button" id="calculate" >Calcular</button>
+
+      <p id='resultado'>Caminho percorrido: </p>
+      <p id='tempo'>Tempo decorrido: </p>
+    </div>
+    <script src="./sketch.js"></script>
 </body></html>

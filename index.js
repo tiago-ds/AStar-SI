@@ -1,23 +1,27 @@
+// Função pra evitar poluição de código. Vai criar o grafo das
+// distâncias reais.
 function addMetroEdges(g){
-    g.addRealEdge('E1','E2',10);
-    g.addRealEdge('E2','E3',8.5);
-    g.addRealEdge('E2','E9',10);
-    g.addRealEdge('E2','E10',3.5);
-    g.addRealEdge('E3','E4',6.3);
-    g.addRealEdge('E3','E9',9.4);
-    g.addRealEdge('E3','E13',18.7);
-    g.addRealEdge('E4','E5',13);
-    g.addRealEdge('E4','E8',15.3);
-    g.addRealEdge('E4','E13',12.8);
-    g.addRealEdge('E5', 'E6',3);
-    g.addRealEdge('E5', 'E7',2.4);
-    g.addRealEdge('E5', 'E8',30);
-    g.addRealEdge('E8', 'E9',9.6);
-    g.addRealEdge('E8', 'E12',6.4);
-    g.addRealEdge('E9','E11',12.2);
-    g.addRealEdge('E13','E14',5.1);
+    g.addRealEdge('E1','E2',10, null,'azul');
+    g.addRealEdge('E2','E3',8.5, null,'azul');
+    g.addRealEdge('E2','E9',10, null, 'amarelo');
+    g.addRealEdge('E2','E10',3.5, null, 'amarelo');
+    g.addRealEdge('E3','E4',6.3, null, 'azul');
+    g.addRealEdge('E3','E9',9.4, null, 'vermelho');
+    g.addRealEdge('E3','E13',18.7, null, 'vermelho');
+    g.addRealEdge('E4','E5',13, null, 'azul');
+    g.addRealEdge('E4','E8',15.3, null, 'verde');
+    g.addRealEdge('E4','E13',12.8, null, 'verde');
+    g.addRealEdge('E5', 'E6',3, null, 'azul');
+    g.addRealEdge('E5', 'E7',2.4, null, 'amarelo');
+    g.addRealEdge('E5', 'E8',30, null, 'amarelo');
+    g.addRealEdge('E8', 'E9',9.6, null, 'amarelo');
+    g.addRealEdge('E8', 'E12',6.4,null,'verde');
+    g.addRealEdge('E9','E11',12.2,null,'vermelho');
+    g.addRealEdge('E13','E14',5.1,null,'vermelho');
 }
 
+// Função pra evitar poluição de código. Vai criar o grafo das
+// distâncias diretas.
 function addDirectEdges(g) {
     g.addDirectEdge('E1','E2',10);
     g.addDirectEdge('E1','E3',18.5);
@@ -111,10 +115,20 @@ function addDirectEdges(g) {
     g.addDirectEdge('E12','E14',33.6);
     g.addDirectEdge('E13','E14',5.1);
 }
+
+// Criar a referência da heap
 let heap;
 
+// A função AStar. G é o grafo, S é o vértice inicial, e E é o vértice final;
 function aStar(g, s, e){
 
+    // Uma condição básica para caso o Node inicial seja o mesmo que o final.
+    // Nesse caso, ele vai retornar um array de tamanho 1, com o node inicial.
+    if(s == e){
+        return [new GraphNode(s, 0, 0, 1)];
+    }
+
+    // Construir a heap
     heap = new MinHeap();
 
     // Check o começo
@@ -122,64 +136,64 @@ function aStar(g, s, e){
 
     // Nodes que eu posso chegar a partir do começo.
     let fronteiras = g.getAdjacentNodes(s);
-    // console.log(fronteiras);
     
+    // Aqui é checado cada node no qual o início faz fronteira, e coloca eles na heap;
     for(const p of fronteiras){
-        // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
-        if(!g.getCheckVertex(p.destiny)){
-            // Marca esse como inserido na Heap
-            g.checkVertex(p.destiny);
-            heap.insert(new GraphNode(p.destiny, g.getDirectDistance(p.destiny, e), g.getRealDistance(s, p.destiny), 1));
-
-        }
+        // Se o destino não estiver na Heap (como é a primeira iteração, não vai estar)
+        // Marca esse como inserido na Heap
+        g.checkVertex(p.destiny);
+        heap.insert(new GraphNode(p.destiny, g.getDirectDistance(p.destiny, e), g.getRealDistance(s, p.destiny), 1, p.cor));
     }
 
+    // Um contador do "nível" da árvore investigado agora
     let fronteiraCounter;
     
-    let atual = {destiny:null};
-    let caminho = [new GraphNode(s, g.getDirectDistance(s, e), g.getRealDistance(s, e), 1)];
-     // Enquanto o tamanho da Heap for maior do que 0, ou TALVEZ (não sei) não chegou no destino
+    // Gambiarra pra fazer o Javascript funcionar;
+    // Basicamente, pra ter uma condição válida pra entrar no while;
+    let atual = { destiny:null };
+
+    // Aqui é iniciado o array do Caminho final. 
+    let caminho = [new GraphNode(s, g.getDirectDistance(s, e), g.getRealDistance(s, e), 1, null)];
+    // Enquanto o tamanho da Heap for maior do que 0, ou não chegou no destino
     while(heap.size() >= 1 && (atual.destiny == null || atual.destiny != e)){
-        // atual vai ser um NODE tirado da Heap (preciso ver essa porra de Node != Edge)
-        const arr = [...heap.heap];
-        console.log(arr);
+        // Transforma o node atual no primeiro elemento da heap, e remove ele de lá;
         atual = heap.remove();
+        // Nesse caso, é usado o valor de fronteira, que é como se fosse o "nível" da árvore,
+        // pra salvar o caminho. O splice vai tirar os elementos extras, só deixando o atual, caso
+        // ele seja o certo.
         caminho.splice(atual.fronteira);
         caminho.push(atual);
+
         console.log('indo para ' + atual.destiny);
+
+        // Ele aumenta um "nível" do valor citado na linha 163;
         fronteiraCounter = atual.fronteira + 1;
+
+        // Marca o vértice atual;
         g.checkVertex(atual.destiny);
 
+        // Pegam os nodes que fazem fronteira com o atual (por isso o nome);
         fronteiras = g.getAdjacentNodes(atual.destiny);
         
+        // Para cada vértice com o qual ele faz fronteira, ele vai checar a inserção na heap;
         for(const p of fronteiras){
-            // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap
-            if(/*!heap.contains(p.destiny) && */!g.getCheckVertex(p.destiny)){
-                // Marca esse como inserido na Heap, e insere
+            // Se o destino não estiver na Heap, nem já estiver marcado no grafo, ele coloca esse node na heap;
+            if(!g.getCheckVertex(p.destiny)){
+                // Marca esse como inserido na Heap, e o insere;
                 g.checkVertex(p.destiny);
-                // Talvez isso ^ não esteja correto
 
-                // Nesse novo NODE eu vou colocar a distância direta desse P pra o FIM, E
-                // O valor salvo em atual, mais a distância de atual pra o que eu tô vendo agora
-                //console.log(`De ${atual.destiny} pra ${p.destiny}: ${g.getRealDistance(atual.destiny, p.destiny)}`);
-                heap.insert(new GraphNode(p.destiny, g.getDirectDistance(p.destiny,e), g.getRealDistance(atual.destiny,p.destiny) + atual.realDistance, fronteiraCounter));
-                
-                // Tem algo errado com a função heurística. Quando eu saio de E7 eu vou pra E4. Tudo certo.
-                // Mas aí, E3 fica com o valor maior que E13, o que não era pra acontecer
-
+                // Nesse new Node, é colocado a distância direta desse P pra o FIM, e
+                // o valor salvo na variável "atual", mais a distância de "atual" pra o que eu está sendo checado agora;
+                //console.log(p.cor)
+                heap.insert(new GraphNode(p.destiny, g.getDirectDistance(p.destiny,e), g.getRealDistance(atual.destiny,p.destiny) + atual.realDistance, fronteiraCounter, p.cor));
             }
         }
     }
-    console.log(heap);
+    caminho[0].cor = g.getColor(caminho[0].destiny,caminho[1].destiny);
+    // Por fim, retorna o array do caminho final.
     return caminho;
  }
 
-metro = new Graph(14);
-for(let x = 1; x <= 14; x++){
-    metro.addVertex('E'+ x);
-}
-addMetroEdges(metro);
-addDirectEdges(metro);
 
 
 // aStar(metro, 'E1', 'E12');

@@ -4,6 +4,8 @@ class Graph{
         this.directDistance = new Map();
     }
 
+
+    // Adiciona um Vértice ao grafo
     addVertex(vertexName){
         this.realDistance.set(vertexName, {checked:false, nodes:[]});
         this.directDistance.set(vertexName, []);
@@ -18,23 +20,23 @@ class Graph{
     getCheckVertex(vertexName){
         return this.realDistance.get(vertexName).checked;
     }
-
+    // Função simples que retorna um Array com os nodes que esse node faz fronteira
     getAdjacentNodes(vertexName){
-        // Retorna um Array com os nodes que esse node faz fronteira
         return this.realDistance.get(vertexName).nodes;
     }
 
     // Adiciona um caminho de V até W no Map de distâncias reais
-    addRealEdge(vertexOrigin, vertexDestiny, weight){
+    addRealEdge(vertexOrigin, vertexDestiny, weight, f, cor){
+
         if(!this.realDistance.has(vertexOrigin) && !this.realDistance.has(vertexDestiny))
             return; // Não pode adicionar um caminho pra nodes que não existem
 
         // Criar a referência ao caminho
-        var edg1 = new GraphNode(vertexOrigin, weight, null);
-        var edg2 = new GraphNode(vertexDestiny, weight, null);
+        var edg1 = new GraphNode(vertexOrigin, null, weight, null, cor);
+        var edg2 = new GraphNode(vertexDestiny, null, weight, null, cor);
 
         // Os dois comandos pois o grafo é não direcional
-        // .nodes porque agora é um array de objetos, com a propriedade "nodes", além da "checked"
+        // .nodes porque é um array de objetos, com a propriedade "nodes", além da "checked"
         this.realDistance.get(vertexOrigin).nodes.push(edg2); // Adicionar A em B 
         this.realDistance.get(vertexDestiny).nodes.push(edg1); // E adicionar B em A
     }
@@ -63,7 +65,7 @@ class Graph{
             let r = Infinity;
             for(const p of this.getVertex(vertexOrigin).real.nodes){
                 if(p.destiny == vertexDestiny){
-                    r = p.directDistance;
+                    r = p.realDistance;
                 }
             }
             return r;
@@ -79,5 +81,12 @@ class Graph{
                     return p.directDistance;
             }
         }
+    }
+
+    getColor(vertexOrigin, vertexDestiny){
+        return this.realDistance.get(vertexOrigin).nodes.filter((a)=>{
+            if(a.destiny === vertexDestiny){
+                return a;
+        }})[0].cor;
     }
 }
