@@ -1,7 +1,9 @@
 class Edge {
-	constructor(vertexOrigin, vertexDestiny, realDistance, directDistance, color) {
+	constructor(vertexOrigin, vertexDestiny, origin, destiny, realDistance, directDistance, color) {
 		this.vertexOrigin = vertexOrigin;
 		this.vertexDestiny = vertexDestiny;
+        this.origin = origin;
+        this.destiny = destiny;
 		this.directDistance = directDistance;
 		this.realDistance = realDistance;
 		this.color = color;
@@ -10,4 +12,10 @@ class Edge {
 	getDistancesSum() {
 		return this.directDistance + this.realDistance;
 	}
+
+    draw(strk){
+        strokeWeight(strk);
+        // console.log("drawing lines");
+        line(this.origin.posX, this.origin.posY, this.destiny.posX, this.destiny.posY)
+    }
 }
