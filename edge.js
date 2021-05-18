@@ -10,12 +10,11 @@ class Edge {
 	}
 
 	getDistancesSum() {
-		return this.directDistance + this.realDistance;
+        return this.directDistance + this.realDistance;
 	}
 
     draw(strk){
         strokeWeight(strk);
-        // console.log("drawing lines");
         line(this.origin.posX, this.origin.posY, this.destiny.posX, this.destiny.posY)
     }
 }
